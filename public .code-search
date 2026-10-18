@@ -1,0 +1,13 @@
+# Query: public 
+# ContextLines: 1
+
+2 results - 1 file
+
+index.html:
+  696                      topics: [
+  697:                         { title: "Module 1: Encapsulation & Access Control", content: "Bundling data and methods within a single class unit and restricting direct external access using private/public modifiers.", example: "Example: Private user balance attributes accessible only through getter and setter methods." },
+  698                          { title: "Module 2: Inheritance & Code Reuse", content: "Creating subclasses that inherit fields and methods from a parent superclass to reduce code redundancy.", example: "Example: Base class Employee with derived FullTimeEmployee and ContractEmployee classes." },
+
+  936              if (PAYSTACK_PUBLIC_KEY.includes("REPLACE_WITH")) {
+  937:                 showToast("const PAYSTACK_PUBLIC_KEY = "pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY";");
+  938                  return;

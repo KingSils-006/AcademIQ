@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#172033">
+    <title>StudyPulse Admin — Management & Content Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: "#172033",
+                        muted: "#718096",
+                        brand: "#635bff",
+                        "brand-dark": "#5148e5",
+                        canvas: "#f7f8fc"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
+                    },
+                    boxShadow: {
+                        card: "0 8px 30px rgba(25, 35, 70, 0.045)"
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: "DM Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        .brand-font {
+            font-family: "Manrope", sans-serif;
+        }
+
+        .sidebar-link.active {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        .sidebar-link.active .nav-icon {
+            color: #818cf8;
+        }
+    </style>
+</head>
+
+<body class="h-full bg-canvas text-ink antialiased">
+    <div class="min-h-screen lg:flex">
+
+        <!-- ADMIN SIDEBAR -->
+        <aside id="admin-sidebar"
+            class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col border-r border-slate-800 bg-slate-900 px-5 py-6 text-slate-300 transition-transform duration-200 lg:static lg:translate-x-0">
+            <div class="mb-10 flex items-center gap-3 px-2">
+                <span
+                    class="grid h-10 w-10 place-items-center rounded-xl bg-brand text-white shadow-lg shadow-indigo-500/30">
+                    <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                </span>
+                <span>
+                    <span class="brand-font block text-lg font-extrabold tracking-tight text-white">StudyPulse<span
+                            class="text-brand">.</span></span>
+                    <span class="block text-[10px] font-semibold uppercase tracking-[.16em] text-indigo-400">Admin
+                        Control</span>
+                </span>
+            </div>
+
+            <p class="mb-3 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-slate-500">Management</p>
+            <nav class="space-y-1">
+                <a href="#" onclick="switchAdminTab('overview')" id="nav-overview"
+                    class="sidebar-link active flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition hover:bg-slate-800">
+                    <svg class="nav-icon h-[18px] w-[18px] text-slate-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="3" width="8" height="8" rx="2" />
+                        <rect x="13" y="3" width="8" height="5" rx="2" />
+                        <rect x="13" y="10" width="8" height="11" rx="2" />
+                        <rect x="3" y="13" width="8" height="8" rx="2" />
+                    </svg>
+                    Revenue & Analytics
+                </a>
+                <a href="#" onclick="switchAdminTab('notes')" id="nav-notes"
+                    class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition hover:bg-slate-800">
+                    <svg class="nav-icon h-[18px] w-[18px] text-slate-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    Course Notes Manager
+                </a>
+                <a href="#" onclick="switchAdminTab('users')" id="nav-users"
+                    class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition hover:bg-slate-800">
+                    <svg class="nav-icon h-[18px] w-[18px] text-slate-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Students & Payments
+                </a>
+            </nav>
+
+            <div class="mt-auto rounded-2xl bg-slate-800/50 p-4 border border-slate-800">
+                <p class="text-xs font-bold text-white">Admin Status</p>
+                <p class="mt-1 text-[11px] text-slate-400">Shared browser storage prototype. Not a secure production
+                    admin.</p>
+                <a href="index.html" target="_blank"
+                    class="mt-3 block text-center rounded-xl bg-brand py-2 text-xs font-bold text-white shadow-md hover:bg-brand-dark transition">
+                    Open Student App ↗
+                </a>
+            </div>
+        </aside>
+        <div id="admin-sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-900/30 lg:hidden"></div>
+
+        <!-- ADMIN MAIN CONTENT -->
+        <main class="min-w-0 flex-1 flex flex-col min-h-screen bg-slate-50">
+            <header
+                class="sticky top-0 z-20 flex min-h-[72px] items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 sm:px-8">
+                <div class="flex min-w-0 items-center gap-3">
+                    <button id="admin-menu-button" type="button"
+                        class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 lg:hidden"
+                        aria-label="Open admin navigation" aria-expanded="false">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <h1 class="min-w-0 text-base font-extrabold leading-tight text-ink sm:text-lg"
+                        id="admin-header-title">Revenue & Financial Analytics</h1>
+                </div>
+                <span
+                    class="shrink-0 rounded-full border border-amber-100 bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-700 sm:px-3 sm:text-xs">Local
+                    Prototype</span>
+            </header>
+
+            <div class="p-5 sm:p-8 xl:p-10 max-w-[1440px] w-full mx-auto space-y-8">
+
+                <!-- TAB 1: OVERVIEW / REVENUE -->
+                <div id="tab-overview" class="admin-section space-y-6">
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <article class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
+                            <p class="text-sm font-medium text-slate-500">Monthly Recurring Revenue (MRR)</p>
+                            <p class="mt-2 text-3xl font-extrabold text-ink" id="stat-mrr">₦0</p>
+                            <p class="mt-1 text-xs text-slate-400">Estimated from verified students in this browser</p>
+                        </article>
+                        <article class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
+                            <p class="text-sm font-medium text-slate-500">Active Subscribed Students</p>
+                            <p class="mt-2 text-3xl font-extrabold text-ink" id="stat-subscribers">0</p>
+                            <p class="mt-1 text-xs text-slate-400">At ₦5,000 / month pass</p>
+                        </article>
+                        <article class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
+                            <p class="text-sm font-medium text-slate-500">Published Courses & Notes</p>
+                            <p class="mt-2 text-3xl font-extrabold text-ink" id="stat-courses">0</p>
+                            <p class="mt-1 text-xs text-slate-400">Across 100L, 200L, and 300L</p>
+                        </article>
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: COURSE NOTES MANAGER (UPLOADER & EDITOR) -->
+                <div id="tab-notes" class="admin-section hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-extrabold text-ink">Course Notes Publisher</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Add or update lecture notes, modules, and examples
+                                that students read in the app.</p>
+                            <p id="course-storage-notice" class="mt-2 text-xs text-amber-700"></p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 shadow-card">
+                        <form id="admin-upload-form" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">Course Code</label>
+                                    <input type="text" id="admin-code" required placeholder="e.g. SEN 205"
+                                        class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">Academic Level</label>
+                                    <select id="admin-level"
+                                        class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                                        <option value="100">100 Level</option>
+                                        <option value="200" selected>200 Level</option>
+                                        <option value="300">300 Level</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Course Title</label>
+                                <input type="text" id="admin-title" required
+                                    placeholder="e.g. Advanced Software Architecture"
+                                    class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Course Description &
+                                    Lecturer</label>
+                                <input type="text" id="admin-desc" required
+                                    placeholder="e.g. Taught by Dr. Fatoki. Microservices & API gateways."
+                                    class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                            </div>
+                            <hr class="border-slate-100 my-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-brand">Module Content</h3>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Module Title</label>
+                                <input type="text" id="admin-mod-title" required
+                                    placeholder="e.g. Module 1: Event-Driven Design"
+                                    class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Detailed Explanation
+                                    Note</label>
+                                <textarea id="admin-mod-content" rows="3" required
+                                    placeholder="Detailed breakdown of the concept..."
+                                    class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Practical Example /
+                                    Walkthrough</label>
+                                <input type="text" id="admin-mod-example" required
+                                    placeholder="e.g. Example: Setting up RabbitMQ message brokers in Python"
+                                    class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                            </div>
+                            <div class="pt-3 flex justify-end">
+                                <button type="submit"
+                                    class="rounded-xl bg-brand px-6 py-3 text-xs font-bold text-white shadow-md shadow-indigo-200 hover:bg-brand-dark transition">
+                                    Publish / Update Course Note
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card sm:p-8">
+                        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h2 class="text-lg font-extrabold text-ink">Managed Course Database Preview</h2>
+                                <p class="mt-1 text-xs leading-relaxed text-slate-500">This JSON is saved to the shared
+                                    browser storage used by the student app.</p>
+                            </div>
+                            <button id="export-course-data" type="button"
+                                class="w-full shrink-0 rounded-xl bg-brand px-5 py-3 text-xs font-bold text-white shadow-lg shadow-indigo-200 transition hover:bg-brand-dark sm:w-auto">
+                                Publish &amp; Copy JSON
+                            </button>
+                        </div>
+                        <pre id="course-json-preview" aria-label="Course database JSON preview"
+                            class="max-h-96 overflow-auto rounded-2xl bg-slate-900 p-4 text-[11px] leading-relaxed text-indigo-200"></pre>
+                    </div>
+                </div>
+
+                <!-- TAB 3: STUDENTS & LOGINS -->
+                <div id="tab-users" class="admin-section hidden space-y-6">
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+                            <p class="text-xs font-medium text-slate-500">Total Registered Students</p>
+                            <p id="stat-total-users" class="mt-1 text-2xl font-extrabold text-ink">0</p>
+                        </article>
+                        <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+                            <p class="text-xs font-medium text-slate-500">Active Subscribers</p>
+                            <p id="stat-active-subs" class="mt-1 text-2xl font-extrabold text-emerald-600">0</p>
+                        </article>
+                        <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+                            <p class="text-xs font-medium text-slate-500">Pending Payment Reviews</p>
+                            <p id="stat-pending-reviews" class="mt-1 text-2xl font-extrabold text-amber-600">0</p>
+                        </article>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card sm:p-8">
+                        <h2 class="mb-1 text-base font-extrabold text-ink">Payment Verification Requests</h2>
+                        <p class="mb-4 text-xs leading-relaxed text-slate-500">Verify Paystack references in your
+                            Paystack dashboard or bank transfers against your bank account before approving. Approval
+                            unlocks notes for that matric number in this browser only.</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[720px] text-left text-xs">
+                                <thead
+                                    class="border-b border-slate-100 text-slate-400 uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="pb-3">Student Name</th>
+                                        <th class="pb-3">Matric Number</th>
+                                        <th class="pb-3">Payment Reference</th>
+                                        <th class="pb-3">Method</th>
+                                        <th class="pb-3">Amount</th>
+                                        <th class="pb-3">Status</th>
+                                        <th class="pb-3">Date</th>
+                                        <th class="pb-3">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50 text-slate-600" id="transfer-requests-table">
+                                </tbody>
+                            </table>
+                            <p id="empty-transfer-requests" class="hidden py-6 text-center text-xs text-slate-400">No
+                                payment requests have been submitted in this browser.</p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
+                        <h2 class="mb-4 text-base font-extrabold text-ink">Registered Students & Matriculation Records
+                        </h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[560px] text-left text-xs">
+                                <thead
+                                    class="border-b border-slate-100 text-slate-400 uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="pb-3">Student Name</th>
+                                        <th class="pb-3">Matric Number</th>
+                                        <th class="pb-3">Login Provider</th>
+                                        <th class="pb-3">Subscription Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50 text-slate-600" id="users-table">
+                                </tbody>
+                            </table>
+                            <p id="empty-users" class="hidden py-6 text-center text-xs text-slate-400">No student
+                                sign-ins recorded in this browser yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"
+        class="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2 translate-y-3 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white opacity-0 shadow-xl transition">
+    </div>
+
+    <script>
+        let courseData = JSON.parse(localStorage.getItem("studypulse_courses") || "null");
+
+        function setAdminNavigationOpen(open) {
+            const sidebar = document.getElementById("admin-sidebar");
+            const backdrop = document.getElementById("admin-sidebar-backdrop");
+            const menuButton = document.getElementById("admin-menu-button");
+            sidebar.classList.toggle("-translate-x-full", !open);
+            backdrop.classList.toggle("hidden", !open);
+            menuButton.setAttribute("aria-expanded", String(open));
+            menuButton.setAttribute("aria-label", open ? "Close admin navigation" : "Open admin navigation");
+        }
+
+        function switchAdminTab(tabId) {
+            document.querySelectorAll(".admin-section").forEach(el => el.classList.add("hidden"));
+            document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+
+            document.querySelectorAll(".sidebar-link").forEach(link => link.classList.remove("active"));
+            document.getElementById(`nav-${tabId}`).classList.add("active");
+
+            const titles = { overview: "Revenue & Financial Analytics", notes: "Course Notes Manager", users: "Students & Payments" };
+            document.getElementById("admin-header-title").textContent = titles[tabId];
+            setAdminNavigationOpen(false);
+        }
+
+        document.getElementById("admin-menu-button").addEventListener("click", () => {
+            const isOpen = document.getElementById("admin-menu-button").getAttribute("aria-expanded") === "true";
+            setAdminNavigationOpen(!isOpen);
+        });
+        document.getElementById("admin-sidebar-backdrop").addEventListener("click", () => setAdminNavigationOpen(false));
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.classList.remove("translate-y-3", "opacity-0");
+            setTimeout(() => t.classList.add("translate-y-3", "opacity-0"), 2400);
+        }
+
+        function renderCoursePreview() {
+            document.getElementById("course-json-preview").textContent = JSON.stringify(courseData || {}, null, 2);
+        }
+
+        async function exportCourseData() {
+            const storedCourses = JSON.parse(localStorage.getItem("studypulse_courses") || "null");
+            if (!storedCourses) {
+                showToast("Course data is not initialized. Open the student app first.");
+                return;
+            }
+
+            courseData = storedCourses;
+            renderCoursePreview();
+            const data = JSON.stringify(courseData, null, 2);
+            try {
+                await navigator.clipboard.writeText(data);
+                showToast("Course JSON copied to clipboard.");
+            } catch (clipboardError) {
+                const copyField = document.createElement("textarea");
+                copyField.value = data;
+                copyField.setAttribute("readonly", "");
+                copyField.style.position = "fixed";
+                copyField.style.opacity = "0";
+                document.body.appendChild(copyField);
+                try {
+                    copyField.select();
+                    if (document.execCommand("copy")) {
+                        showToast("Course JSON copied to clipboard.");
+                    } else {
+                        console.error("Could not copy course JSON to clipboard.", clipboardError);
+                        showToast("Clipboard access failed. Select and copy the JSON preview.");
+                    }
+                } catch (fallbackError) {
+                    console.error("Could not copy course JSON to clipboard.", fallbackError);
+                    showToast("Clipboard access failed. Select and copy the JSON preview.");
+                } finally {
+                    copyField.remove();
+                }
+            }
+        }
+
+        document.getElementById("export-course-data").addEventListener("click", exportCourseData);
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        function getArrayFromStorage(key) {
+            const value = JSON.parse(localStorage.getItem(key) || "[]");
+            return Array.isArray(value) ? value : value ? [value] : [];
+        }
+
+        function isStudentVerified(matric, verifiedStudents) {
+            return verifiedStudents.some(verifiedMatric => verifiedMatric.toUpperCase() === matric.toUpperCase());
+        }
+
+        function approveTransfer(matric) {
+            const requests = getArrayFromStorage("studypulse_transfer_request");
+            const request = requests.find(item => item.matric.toUpperCase() === matric.toUpperCase());
+            if (!request || request.status !== "pending") return;
+
+            const verifiedStudents = getArrayFromStorage("studypulse_verified_students");
+            if (!isStudentVerified(matric, verifiedStudents)) verifiedStudents.push(matric);
+            request.status = "approved";
+            request.reviewedAt = new Date().toISOString();
+            localStorage.setItem("studypulse_verified_students", JSON.stringify(verifiedStudents));
+            localStorage.setItem("studypulse_transfer_request", JSON.stringify(requests));
+            showToast(`Verified payment for ${matric}. Student access is active in this browser.`);
+            updateStats();
+        }
+
+        function rejectTransfer(matric) {
+            const requests = getArrayFromStorage("studypulse_transfer_request");
+            const request = requests.find(item => item.matric.toUpperCase() === matric.toUpperCase());
+            if (!request || request.status !== "pending") return;
+            request.status = "rejected";
+            request.reviewedAt = new Date().toISOString();
+            localStorage.setItem("studypulse_transfer_request", JSON.stringify(requests));
+            showToast(`Transfer request for ${matric} was rejected.`);
+            updateStats();
+        }
+
+        function renderTransferRequests() {
+            const requests = getArrayFromStorage("studypulse_transfer_request");
+            const table = document.getElementById("transfer-requests-table");
+            table.replaceChildren();
+            document.getElementById("empty-transfer-requests").classList.toggle("hidden", requests.length > 0);
+
+            requests.forEach(request => {
+                const row = document.createElement("tr");
+                const statusClass = request.status === "approved"
+                    ? "bg-emerald-50 text-emerald-600"
+                    : request.status === "rejected"
+                        ? "bg-rose-50 text-rose-600"
+                        : "bg-amber-50 text-amber-700";
+                const statusLabel = request.status === "approved" ? "Verified" : request.status === "rejected" ? "Rejected" : "Pending";
+                const date = request.submittedAt ? new Date(request.submittedAt).toLocaleString() : "—";
+                row.innerHTML = `
+                    <td class="py-3 font-bold text-ink">${escapeHtml(request.name)}</td>
+                    <td class="py-3 font-mono">${escapeHtml(request.matric)}</td>
+                    <td class="py-3 font-mono text-slate-400">${escapeHtml(request.reference)}</td>
+                    <td class="py-3">${escapeHtml(request.method === "paystack" ? "Paystack" : "Bank transfer")}</td>
+                    <td class="py-3 font-bold">₦${escapeHtml((request.amount || 5000).toLocaleString())}</td>
+                    <td class="py-3"><span class="rounded-md px-2 py-0.5 text-[10px] font-bold ${statusClass}">${statusLabel}</span></td>
+                    <td class="py-3 text-slate-400">${escapeHtml(date)}</td>
+                    <td class="py-3"></td>
+                `;
+                const actionCell = row.lastElementChild;
+                if (request.status === "pending") {
+                    const approveButton = document.createElement("button");
+                    approveButton.type = "button";
+                    approveButton.className = "mr-2 rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700 hover:bg-emerald-100";
+                    approveButton.textContent = "Approve";
+                    approveButton.addEventListener("click", () => approveTransfer(request.matric));
+                    const rejectButton = document.createElement("button");
+                    rejectButton.type = "button";
+                    rejectButton.className = "rounded-md bg-rose-50 px-2 py-1 text-[10px] font-bold text-rose-700 hover:bg-rose-100";
+                    rejectButton.textContent = "Reject";
+                    rejectButton.addEventListener("click", () => rejectTransfer(request.matric));
+                    actionCell.append(approveButton, rejectButton);
+                } else {
+                    actionCell.textContent = "—";
+                }
+                table.appendChild(row);
+            });
+        }
+
+        function renderUsers() {
+            const users = getArrayFromStorage("studypulse_users");
+            const verifiedStudents = getArrayFromStorage("studypulse_verified_students");
+            const table = document.getElementById("users-table");
+            table.replaceChildren();
+            document.getElementById("empty-users").classList.toggle("hidden", users.length > 0);
+
+            users.forEach(user => {
+                const row = document.createElement("tr");
+                const isActive = isStudentVerified(user.matric, verifiedStudents);
+                row.innerHTML = `
+                    <td class="py-3 font-bold text-ink">${escapeHtml(user.name)}</td>
+                    <td class="py-3 font-mono text-brand">${escapeHtml(user.matric)}</td>
+                    <td class="py-3">${escapeHtml(user.provider === "google" ? "Google (demo)" : "Student details")}</td>
+                    <td class="py-3"><span class="rounded-md px-2 py-0.5 text-[10px] font-bold ${isActive ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}">${isActive ? "Verified" : "Inactive"}</span></td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        // Handle Admin Note Upload
+        document.getElementById("admin-upload-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const storedCourses = JSON.parse(localStorage.getItem("studypulse_courses") || "null");
+            if (!storedCourses) {
+                showToast("Open the student app once to initialize the shared course library.");
+                return;
+            }
+            courseData = storedCourses;
+            const code = document.getElementById("admin-code").value.trim().toUpperCase();
+            const level = document.getElementById("admin-level").value;
+            const title = document.getElementById("admin-title").value.trim();
+            const desc = document.getElementById("admin-desc").value.trim();
+            const modTitle = document.getElementById("admin-mod-title").value.trim();
+            const modContent = document.getElementById("admin-mod-content").value.trim();
+            const modExample = document.getElementById("admin-mod-example").value.trim();
+
+            if (!courseData[level]) courseData[level] = [];
+
+            let existing = courseData[level].find(c => c.code === code);
+            if (existing) {
+                existing.modules += 1;
+                existing.topics.push({ title: modTitle, content: modContent, example: modExample });
+            } else {
+                courseData[level].push({
+                    code, title, modules: 1, description: desc,
+                    topics: [{ title: modTitle, content: modContent, example: modExample }]
+                });
+            }
+
+            localStorage.setItem("studypulse_courses", JSON.stringify(courseData));
+            document.getElementById("admin-upload-form").reset();
+            showToast(`Course ${code} published successfully to student library!`);
+            updateStats();
+        });
+
+        function updateStats() {
+            let totalCourses = 0;
+            Object.values(courseData || {}).forEach(lvl => totalCourses += lvl.length);
+            document.getElementById("stat-courses").textContent = totalCourses;
+            const verifiedStudents = getArrayFromStorage("studypulse_verified_students");
+            const users = getArrayFromStorage("studypulse_users");
+            const requests = getArrayFromStorage("studypulse_transfer_request");
+            document.getElementById("stat-subscribers").textContent = verifiedStudents.length;
+            document.getElementById("stat-mrr").textContent = `₦${(verifiedStudents.length * 5000).toLocaleString()}`;
+            document.getElementById("stat-total-users").textContent = users.length;
+            document.getElementById("stat-active-subs").textContent = verifiedStudents.length;
+            document.getElementById("stat-pending-reviews").textContent = requests.filter(request => request.status === "pending").length;
+            document.getElementById("course-storage-notice").textContent = courseData
+                ? "Course changes are saved in this browser and appear in the student app opened in the same browser."
+                : "Open the student app once in this browser to initialize its course notes before publishing changes.";
+            renderCoursePreview();
+            renderTransferRequests();
+            renderUsers();
+        }
+
+        updateStats();
+        window.addEventListener("storage", event => {
+            if (event.key === "studypulse_courses") {
+                courseData = JSON.parse(event.newValue || "null");
+                updateStats();
+            }
+            if (["studypulse_users", "studypulse_verified_students", "studypulse_transfer_request"].includes(event.key)) {
+                updateStats();
+            }
+        });
+    </script>
+</body>
+
+</html>

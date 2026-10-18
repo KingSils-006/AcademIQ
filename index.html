@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8fafc">
+    <title>StudyPulse — Faculty of Engineering & Computer Science Note Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: "#172033",
+                        muted: "#718096",
+                        brand: "#635bff",
+                        "brand-dark": "#5148e5",
+                        canvas: "#f7f8fc"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
+                    },
+                    boxShadow: {
+                        card: "0 8px 30px rgba(25, 35, 70, 0.045)"
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: "DM Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        .brand-font {
+            font-family: "Manrope", sans-serif;
+        }
+
+        .sidebar-link.active {
+            background: #efefff;
+            color: #5148e5;
+        }
+
+        .sidebar-link.active .nav-icon {
+            color: #635bff;
+        }
+
+        .bar {
+            transform-origin: bottom;
+            animation: grow .7s ease-out both;
+        }
+
+        @keyframes grow {
+            from {
+                transform: scaleY(.15);
+                opacity: .45;
+            }
+
+            to {
+                transform: scaleY(1);
+                opacity: 1;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="h-full bg-canvas text-ink antialiased">
+
+    <!-- LOGIN / AUTH MODAL (Hidden if logged in) -->
+    <div id="auth-modal"
+        class="fixed inset-0 z-50 hidden flex min-h-full items-start justify-center overflow-y-auto overscroll-contain bg-slate-900/60 p-3 backdrop-blur-sm md:items-center md:p-4">
+        <div
+            class="my-0 w-full max-w-md rounded-3xl border border-slate-100 bg-white p-5 text-center shadow-2xl md:my-auto md:p-8">
+            <span
+                class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand text-white shadow-lg shadow-indigo-200 mb-4">
+                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h4l3-8 4 16 3-8h4" />
+                    <path d="M5 5h.01M19 19h.01" />
+                </svg>
+            </span>
+            <h2 class="text-xl font-extrabold text-ink">Welcome to StudyPulse</h2>
+            <p class="mt-1 text-xs text-slate-500">Sign in with your student details to access engineering notes.</p>
+
+            <form id="login-form" class="mt-6 space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+                    <input type="text" id="login-name" required placeholder="e.g. Seyi Makiwa"
+                        class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Matriculation Number</label>
+                    <input type="text" id="login-matric" required placeholder="e.g. LCU/UG/25/37419"
+                        class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                </div>
+                <button type="submit"
+                    class="w-full rounded-xl bg-brand py-3 text-xs font-bold text-white shadow-md shadow-indigo-200 hover:bg-brand-dark transition">
+                    Continue to Dashboard
+                </button>
+            </form>
+
+            <div class="mt-4 relative flex py-2 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-4 text-[10px] uppercase font-bold text-slate-400">or</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <button onclick="loginWithGoogle()"
+                class="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+                <svg class="h-4 w-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4"
+                        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" />
+                    <path fill="#34A853"
+                        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.2v3.15C3.18 21.32 7.23 24 12 24z" />
+                    <path fill="#FBBC05"
+                        d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.2C.43 8.13 0 9.87 0 11.7c0 1.83.43 3.57 1.2 5.12l4.08-2.55z" />
+                    <path fill="#EA4335"
+                        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.18 2.68 1.2 6.58l4.08 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
+                </svg>
+                Sign in with Google Account
+            </button>
+        </div>
+    </div>
+
+    <!-- PAYMENT / PAYWALL MODAL (Shown if not subscribed) -->
+    <div id="paywall-modal"
+        class="fixed inset-0 z-50 hidden flex min-h-full items-start justify-center overflow-y-auto overscroll-contain bg-slate-900/70 p-3 backdrop-blur-sm md:items-center md:p-4">
+        <div
+            class="my-0 w-full max-w-md rounded-3xl border border-slate-100 bg-white p-5 text-center shadow-2xl md:my-auto md:p-8">
+            <span
+                class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-amber-50 text-amber-600 shadow-md mb-4">
+                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+            </span>
+            <h2 class="text-xl font-extrabold text-ink">Unlock Full Note Library</h2>
+            <p class="mt-1.5 text-xs text-slate-500 leading-relaxed">Subscribe to access all semester lecture notes,
+                detailed explanations, and examples across 100L, 200L, and 300L.</p>
+
+            <div class="my-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 p-5 border border-indigo-100">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Monthly Pass</p>
+                <p class="text-3xl font-extrabold text-brand mt-1">₦5,000 <span
+                        class="text-xs font-semibold text-slate-400">/ month</span></p>
+                <ul class="mt-3 space-y-1.5 text-left text-xs font-semibold text-slate-600">
+                    <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg> Unlimited access to all engineering courses</li>
+                    <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg> Step-by-step walkthrough examples</li>
+                    <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg> Cancel anytime</li>
+                </ul>
+            </div>
+
+            <div class="mb-3 text-left">
+                <label for="paystack-email" class="mb-1 block text-xs font-bold text-slate-600">Email for Paystack
+                    receipt</label>
+                <input id="paystack-email" type="email" autocomplete="email" required placeholder="you@example.com"
+                    class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+            </div>
+            <button id="paystack-button" type="button" onclick="startPaystackPayment()"
+                class="w-full rounded-xl bg-brand py-3 text-xs font-bold text-white shadow-lg shadow-indigo-200 hover:bg-brand-dark transition">
+                Pay ₦5,000 with Paystack
+            </button>
+            <p class="mt-2 text-[10px] text-slate-400">After payment, an admin must verify the reference before access
+                is activated.</p>
+            <div class="my-4 flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <span class="h-px flex-1 bg-slate-200"></span>or bank transfer<span
+                    class="h-px flex-1 bg-slate-200"></span>
+            </div>
+            <button onclick="openTransferScreen()"
+                class="w-full rounded-xl border border-slate-200 bg-white py-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50">
+                View Bank Transfer Details
+            </button>
+        </div>
+    </div>
+
+    <div id="transfer-modal"
+        class="fixed inset-0 z-50 hidden min-h-full items-start justify-center overflow-y-auto overscroll-contain bg-slate-900/70 p-3 backdrop-blur-sm md:items-center md:p-4">
+        <section
+            class="my-0 w-full max-w-md rounded-3xl border border-slate-100 bg-white p-5 shadow-2xl md:my-auto md:p-8"
+            aria-labelledby="transfer-heading">
+            <button id="transfer-back" type="button" class="mb-5 text-xs font-bold text-brand hover:text-brand-dark">←
+                Back to subscription</button>
+            <div id="transfer-form-view">
+                <h2 id="transfer-heading" class="text-xl font-extrabold text-ink">Pay by bank transfer</h2>
+                <p class="mt-1.5 text-xs leading-relaxed text-slate-500">Transfer exactly ₦5,000. After sending it,
+                    enter the transaction reference so the admin can match your payment.</p>
+                <dl class="my-5 space-y-3 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4 text-sm">
+                    <div class="flex justify-between gap-4">
+                        <dt class="text-slate-500">Bank</dt>
+                        <dd class="font-bold text-ink">Alpha Morgan Bank</dd>
+                    </div>
+                    <div class="flex justify-between gap-4">
+                        <dt class="text-slate-500">Account number</dt>
+                        <dd class="select-all font-extrabold tracking-wide text-ink">1010111200</dd>
+                    </div>
+                    <div class="flex justify-between gap-4">
+                        <dt class="text-slate-500">Account name</dt>
+                        <dd class="text-right font-bold text-ink">Tolulope Olajumoke Ogunkeyede</dd>
+                    </div>
+                    <div class="flex justify-between gap-4 border-t border-indigo-100 pt-3">
+                        <dt class="font-semibold text-slate-600">Amount</dt>
+                        <dd class="font-extrabold text-brand">₦5,000</dd>
+                    </div>
+                </dl>
+                <p class="mb-4 rounded-xl bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-800">Only send money if
+                    you have confirmed these account details with StudyPulse. Never share your PIN, password, or
+                    one-time codes.</p>
+                <form id="transfer-form" class="space-y-3">
+                    <div>
+                        <label for="transfer-reference" class="mb-1 block text-xs font-bold text-slate-600">Bank
+                            transfer reference</label>
+                        <input id="transfer-reference" name="reference" type="text" required maxlength="100"
+                            autocomplete="off" placeholder="Enter the transaction reference"
+                            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-brand">
+                    </div>
+                    <button type="submit"
+                        class="w-full rounded-xl bg-brand py-3 text-xs font-bold text-white shadow-md shadow-indigo-200 transition hover:bg-brand-dark">Submit
+                        for payment verification</button>
+                </form>
+                <p class="mt-3 text-center text-[10px] leading-relaxed text-slate-400">Submitting a reference does not
+                    confirm payment or unlock notes. Access follows admin verification against the bank account.</p>
+            </div>
+            <div id="transfer-pending-view" class="hidden">
+                <span class="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-amber-50 text-amber-600">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 7v5l3 2" />
+                    </svg>
+                </span>
+                <h2 class="text-xl font-extrabold text-ink">Payment submitted for review</h2>
+                <p class="mt-2 text-sm leading-relaxed text-slate-500">Your payment reference is pending. An admin must
+                    verify it with the payment provider or bank before your subscription is activated.</p>
+                <p class="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">Reference: <span
+                        id="pending-reference" class="break-all font-bold text-ink"></span></p>
+                <p class="mt-3 text-[10px] leading-relaxed text-slate-400">This prototype stores the request only in
+                    this browser. A payment reference is not proof of settlement.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="min-h-screen lg:flex">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar"
+            class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col border-r border-slate-100 bg-white px-5 py-6 transition-transform duration-200 lg:static lg:translate-x-0">
+            <a href="#" onclick="switchView('dashboard')" class="mb-10 flex items-center gap-3 px-2"
+                aria-label="StudyPulse home">
+                <span
+                    class="grid h-10 w-10 place-items-center rounded-xl bg-brand text-white shadow-lg shadow-indigo-200">
+                    <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h4l3-8 4 16 3-8h4" />
+                        <path d="M5 5h.01M19 19h.01" />
+                    </svg>
+                </span>
+                <span>
+                    <span class="brand-font block text-lg font-extrabold tracking-tight">StudyPulse<span
+                            class="text-brand">.</span></span>
+                    <span class="block text-[10px] font-semibold uppercase tracking-[.16em] text-slate-400">Note
+                        Library</span>
+                </span>
+            </a>
+
+            <p class="mb-3 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Workspace</p>
+            <nav class="space-y-1" aria-label="Main navigation">
+                <a href="#" onclick="switchView('dashboard')" data-view="Dashboard"
+                    class="sidebar-link active flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                    <svg class="nav-icon h-[18px] w-[18px] text-slate-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="3" width="8" height="8" rx="2" />
+                        <rect x="13" y="3" width="8" height="5" rx="2" />
+                        <rect x="13" y="10" width="8" height="11" rx="2" />
+                        <rect x="3" y="13" width="8" height="8" rx="2" />
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="#" onclick="switchView('courses')" data-view="My courses"
+                    class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                    <svg class="nav-icon h-[18px] w-[18px] text-slate-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+                        <path d="m3 12 9 5 9-5M3 16l9 5 9-5" />
+                    </svg>
+                    Course Notes Library
+                    <span class="ml-auto rounded-md bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-brand"
+                        id="course-count-badge">6</span>
+                </a>
+                <a href="#" onclick="switchView('planner')" data-view="Study planner"
+                    class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                    <svg class="nav-icon h-[18px] w-[18px] text-slate-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7" />
+                    </svg>
+                    Study planner
+                </a>
+            </nav>
+
+            <div class="mt-auto rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 p-4">
+                <div class="mb-2 flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-700">Subscription</span>
+                    <span id="subscription-status-pill"
+                        class="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">Inactive</span>
+                </div>
+                <p id="subscription-status-detail" class="text-[11px] leading-relaxed text-slate-500">No active pass.
+                </p>
+            </div>
+
+            <div class="mt-5 flex items-center justify-between rounded-xl px-2 py-2 text-left">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span id="user-initial"
+                        class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-amber-100 text-xs font-bold text-amber-800">T</span>
+                    <span class="min-w-0 flex-1"><span id="user-display-name"
+                            class="block truncate text-sm font-bold">Tolu Seyi Makiwa</span><span
+                            id="user-display-matric"
+                            class="block truncate text-[10px] text-slate-400">LCU/UG/25/37419</span></span>
+                </div>
+                <button onclick="logoutUser()" title="Log out"
+                    class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-100">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                </button>
+            </div>
+        </aside>
+
+        <div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-900/30 lg:hidden"></div>
+
+        <!-- Main Wrapper -->
+        <main class="min-w-0 flex-1 flex flex-col min-h-screen">
+            <header
+                class="sticky top-0 z-25 flex h-[72px] items-center justify-between border-b border-slate-100 bg-white/90 px-5 backdrop-blur sm:px-8 xl:px-10">
+                <div class="flex items-center gap-3">
+                    <button id="menu-button" type="button"
+                        class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 lg:hidden"
+                        aria-label="Open navigation menu" aria-expanded="false">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <div class="hidden items-center gap-2 text-xs text-slate-400 sm:flex"><span>Faculty of
+                            Engineering</span><span>/</span><span id="breadcrumb-title"
+                            class="font-semibold text-slate-600">Dashboard</span></div>
+                    <span id="mobile-page-title" class="text-sm font-bold sm:hidden">Dashboard</span>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-5">
+                    <span
+                        class="hidden items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 sm:flex">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 3a6 6 0 0 0-6 6c0 7-3 7-3 9h18c0-2-3-2-3-9a6 6 0 0 0-6-6ZM10 21h4" />
+                        </svg>
+                        5 day streak
+                    </span>
+                    <span id="header-initial"
+                        class="grid h-9 w-9 place-items-center rounded-full bg-amber-100 text-xs font-bold text-amber-800 sm:hidden">T</span>
+                </div>
+            </header>
+
+            <!-- VIEW 1: DASHBOARD -->
+            <div id="view-dashboard" class="app-view mx-auto max-w-[1440px] w-full px-5 py-7 sm:px-8 sm:py-9 xl:px-10">
+                <section class="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                    <div>
+                        <p class="mb-1 text-sm font-semibold text-slate-400">Software Engineering · Note Repository</p>
+                        <h1 class="text-2xl font-extrabold tracking-tight text-ink sm:text-[30px]">Welcome back, <span
+                                id="welcome-name">Tolu</span> <span aria-hidden="true">👋</span></h1>
+                        <p class="mt-1 text-sm text-slate-500">Access ready-made timetable lecture notes, explanations,
+                            and examples level by level.</p>
+                    </div>
+                    <button onclick="switchView('courses')" type="button"
+                        class="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-brand-dark sm:self-auto">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+                        </svg>
+                        Browse Course Library
+                    </button>
+                </section>
+
+                <!-- Stats Overview -->
+                <section class="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Study overview">
+                    <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+                        <div class="mb-5 flex items-start justify-between"><span
+                                class="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-brand"><svg
+                                    class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="9" />
+                                    <path d="M12 7v5l3 2" />
+                                </svg></span><span
+                                class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">+12%
+                                this week</span></div>
+                        <p class="text-sm font-medium text-slate-500">Study time this week</p>
+                        <p class="mt-1 text-2xl font-extrabold tracking-tight">6h 24m</p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+                        <div class="mb-5 flex items-start justify-between"><span
+                                class="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-600"><svg
+                                    class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+                                </svg></span><span class="text-xs font-semibold text-slate-400">Software
+                                Engineering</span></div>
+                        <p class="text-sm font-medium text-slate-500">Topics reviewed</p>
+                        <p class="mt-1 text-2xl font-extrabold tracking-tight">12 <span
+                                class="text-sm font-semibold text-slate-400">modules</span></p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+                        <div class="mb-5 flex items-start justify-between"><span
+                                class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-600"><svg
+                                    class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <path d="M14 2v6h6M8 13h8M8 17h8" />
+                                </svg></span><span
+                                class="rounded-full bg-violet-50 px-2.5 py-1 text-[10px] font-bold text-violet-600">Timetable
+                                Loaded</span></div>
+                        <p class="text-sm font-medium text-slate-500">Available Courses</p>
+                        <p class="mt-1 text-2xl font-extrabold tracking-tight" id="stat-course-count">6</p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+                        <div class="mb-5 flex items-start justify-between"><span
+                                class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><svg
+                                    class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path
+                                        d="M12 3v2m7.07.93-1.42 1.42M21 12h-2m-.93 7.07-1.42-1.42M12 21v-2m-7.07.07 1.42-1.42M3 12h2m.93-7.07 1.42 1.42" />
+                                    <circle cx="12" cy="12" r="4" />
+                                </svg></span><span class="text-xs font-semibold text-slate-400">Personal best: 9
+                                days</span></div>
+                        <p class="text-sm font-medium text-slate-500">Reading streak</p>
+                        <p class="mt-1 text-2xl font-extrabold tracking-tight">5 <span
+                                class="text-sm font-semibold text-slate-400">days</span></p>
+                    </article>
+                </section>
+
+                <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,.85fr)]">
+                    <div class="space-y-6">
+                        <!-- Activity Chart -->
+                        <section class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card sm:p-6">
+                            <div class="mb-6 flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-base font-extrabold">Study activity</h2>
+                                    <p class="mt-1 text-xs text-slate-400">Your focused reading hours over the past week
+                                    </p>
+                                </div>
+                                <span
+                                    class="rounded-lg border border-slate-100 px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-50">This
+                                    week</span>
+                            </div>
+                            <div class="grid grid-cols-[32px_1fr] gap-3">
+                                <div
+                                    class="flex h-40 flex-col justify-between pb-6 text-[10px] font-medium text-slate-400">
+                                    <span>4h</span><span>3h</span><span>2h</span><span>1h</span><span>0</span>
+                                </div>
+                                <div class="relative h-40">
+                                    <div
+                                        class="absolute inset-x-0 top-0 flex h-[calc(100%-24px)] flex-col justify-between">
+                                        <span class="border-t border-dashed border-slate-100"></span><span
+                                            class="border-t border-dashed border-slate-100"></span><span
+                                            class="border-t border-dashed border-slate-100"></span><span
+                                            class="border-t border-dashed border-slate-100"></span><span
+                                            class="border-t border-slate-100"></span>
+                                    </div>
+                                    <div
+                                        class="absolute inset-x-0 bottom-6 top-1 flex items-end justify-around gap-2 px-2 sm:gap-5 sm:px-7">
+                                        <div class="bar group relative h-[15%] w-7 rounded-t-md bg-indigo-100 transition hover:bg-brand sm:w-9"
+                                            style="animation-delay:40ms"></div>
+                                        <div class="bar group relative h-[30%] w-7 rounded-t-md bg-brand transition hover:bg-brand-dark sm:w-9"
+                                            style="animation-delay:90ms"></div>
+                                        <div class="bar group relative h-[10%] w-7 rounded-t-md bg-indigo-100 transition hover:bg-brand sm:w-9"
+                                            style="animation-delay:140ms"></div>
+                                        <div class="bar group relative h-[25%] w-7 rounded-t-md bg-indigo-100 transition hover:bg-brand sm:w-9"
+                                            style="animation-delay:190ms"></div>
+                                        <div class="bar group relative h-[15%] w-7 rounded-t-md bg-indigo-100 transition hover:bg-brand sm:w-9"
+                                            style="animation-delay:240ms"></div>
+                                        <div class="bar group relative h-[40%] w-7 rounded-t-md bg-indigo-100 transition hover:bg-brand sm:w-9"
+                                            style="animation-delay:290ms"></div>
+                                        <div class="bar group relative h-[25%] w-7 rounded-t-md bg-indigo-100 transition hover:bg-brand sm:w-9"
+                                            style="animation-delay:340ms"></div>
+                                    </div>
+                                    <div
+                                        class="absolute inset-x-0 bottom-0 flex justify-around px-1 text-[10px] font-semibold text-slate-400 sm:px-6">
+                                        <span>Mon</span><span
+                                            class="text-brand">Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Task Checklist -->
+                        <section id="study-planner"
+                            class="rounded-2xl border border-slate-100 bg-white p-5 shadow-card sm:p-6">
+                            <div class="mb-5 flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-base font-extrabold">Study task checklist</h2>
+                                    <p id="task-count" class="mt-1 text-xs text-slate-400">2 of 3 completed</p>
+                                </div>
+                                <button id="add-task-button" type="button"
+                                    class="rounded-lg px-3 py-2 text-xs font-bold text-brand transition hover:bg-indigo-50">+
+                                    Add goal</button>
+                            </div>
+                            <div id="task-list" class="space-y-2">
+                                <label
+                                    class="task-row flex cursor-pointer items-center gap-3 rounded-xl border border-slate-100 p-3.5 transition hover:border-indigo-100 hover:bg-slate-50">
+                                    <input type="checkbox" checked data-pending="To do"
+                                        class="task-check h-4 w-4 rounded border-slate-300 accent-brand">
+                                    <span class="min-w-0 flex-1"><span
+                                            class="task-title block text-sm font-semibold text-slate-400 line-through">Review
+                                            SEN 201 OOP polymorphism notes</span><span
+                                            class="mt-1 block text-[11px] text-slate-400">Software Engineering <span
+                                                class="mx-1">·</span> 30 min</span></span><span
+                                        class="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">Done</span>
+                                </label>
+                                <label
+                                    class="task-row flex cursor-pointer items-center gap-3 rounded-xl border border-slate-100 p-3.5 transition hover:border-indigo-100 hover:bg-slate-50">
+                                    <input type="checkbox" data-pending="Today"
+                                        class="task-check h-4 w-4 rounded border-slate-300 accent-brand">
+                                    <span class="min-w-0 flex-1"><span
+                                            class="task-title block text-sm font-semibold">Solve CSC 202 binary tree
+                                            traversal problems</span><span
+                                            class="mt-1 block text-[11px] text-slate-400">Data Structures <span
+                                                class="mx-1">·</span> 45 min</span></span><span
+                                        class="rounded-md bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-700">Today</span>
+                                </label>
+                                <label
+                                    class="task-row flex cursor-pointer items-center gap-3 rounded-xl border border-slate-100 p-3.5 transition hover:border-indigo-100 hover:bg-slate-50">
+                                    <input type="checkbox" checked data-pending="To do"
+                                        class="task-check h-4 w-4 rounded border-slate-300 accent-brand">
+                                    <span class="min-w-0 flex-1"><span
+                                            class="task-title block text-sm font-semibold text-slate-400 line-through">Read
+                                            MTH 201 matrices summary</span><span
+                                            class="mt-1 block text-[11px] text-slate-400">Math Methods <span
+                                                class="mx-1">·</span> 20 min</span></span><span
+                                        class="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">Done</span>
+                                </label>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Subscription Status Card -->
+                        <section
+                            class="overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 p-6 shadow-card">
+                            <span
+                                class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-600 text-white shadow-md mb-4">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                    <polyline points="22 4 12 14.01 9 11.01" />
+                                </svg>
+                            </span>
+                            <h2 id="subscription-card-heading" class="text-base font-extrabold text-ink">Subscription
+                                inactive</h2>
+                            <p id="subscription-card-description" class="mt-1 text-xs leading-relaxed text-slate-600">
+                                Complete a bank transfer and wait for payment verification to access the course notes.
+                            </p>
+                            <div
+                                class="mt-4 flex items-center justify-between text-xs font-bold text-emerald-700 bg-white/80 p-3 rounded-xl border border-emerald-100">
+                                <span>Plan: ₦5,000 / month</span>
+                                <span id="subscription-plan-status" class="text-slate-400 font-normal">Awaiting
+                                    payment</span>
+                            </div>
+                        </section>
+
+                        <!-- Quote Card -->
+                        <section
+                            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 p-5 text-white shadow-card">
+                            <div class="absolute -right-7 -top-8 h-32 w-32 rounded-full border-[18px] border-white/5">
+                            </div>
+                            <div class="relative">
+                                <span
+                                    class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold text-indigo-200"><svg
+                                        class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z" />
+                                    </svg> Daily motivation</span>
+                                <p class="max-w-xs text-sm font-semibold leading-relaxed">“Simplicity is prerequisite
+                                    for reliability.”</p>
+                                <p class="mt-2 text-[10px] font-medium text-indigo-300">— Edsger W. Dijkstra</p>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: COURSE LIBRARY -->
+            <div id="view-courses"
+                class="app-view hidden mx-auto max-w-[1440px] w-full px-5 py-7 sm:px-8 sm:py-9 xl:px-10">
+                <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                    <div>
+                        <span
+                            class="inline-block rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-bold text-brand mb-2">Faculty
+                            of Engineering · Computer Science & Software Engineering</span>
+                        <h1 class="text-2xl font-extrabold tracking-tight text-ink sm:text-[30px]">Course Notes Library
+                        </h1>
+                        <p class="mt-1 text-sm text-slate-500">Select your academic level to explore ready-made
+                            timetable lecture notes, explanations, and examples.</p>
+                    </div>
+                </div>
+
+                <!-- Level Tabs -->
+                <div class="mb-6 flex gap-2 border-b border-slate-200 pb-3" role="tablist">
+                    <button onclick="switchLevel(100)" id="tab-100"
+                        class="level-tab rounded-xl px-4 py-2 text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">100
+                        Level</button>
+                    <button onclick="switchLevel(200)" id="tab-200"
+                        class="level-tab rounded-xl px-4 py-2 text-sm font-bold bg-brand text-white shadow-sm transition">200
+                        Level</button>
+                    <button onclick="switchLevel(300)" id="tab-300"
+                        class="level-tab rounded-xl px-4 py-2 text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition">300
+                        Level</button>
+                </div>
+
+                <!-- Course Grid Container -->
+                <div id="course-grid" class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    <!-- Dynamic courses render here -->
+                </div>
+            </div>
+
+            <!-- VIEW 3: COURSE READER -->
+            <div id="view-reader" class="app-view hidden mx-auto max-w-5xl w-full px-5 py-7 sm:px-8 sm:py-9">
+                <button onclick="switchView('courses')"
+                    class="mb-6 inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 shadow-sm transition hover:bg-slate-50">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
+                    Back to Course Library
+                </button>
+
+                <div id="reader-content"
+                    class="bg-white rounded-2xl border border-slate-100 p-6 sm:p-10 shadow-card space-y-6">
+                    <!-- Note details rendered here -->
+                </div>
+            </div>
+
+            <!-- VIEW 4: PLANNER -->
+            <div id="view-planner" class="app-view hidden mx-auto max-w-4xl w-full px-5 py-12">
+                <h1 class="text-2xl font-extrabold mb-4">Study Planner</h1>
+                <p class="text-slate-600">Track your timetable milestones and exam reading schedules here.</p>
+            </div>
+
+            <footer class="mt-auto pb-6 pt-8 text-center text-[11px] text-slate-400">StudyPulse Note Library <span
+                    class="mx-1">·</span> Faculty of Engineering</footer>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2 translate-y-3 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white opacity-0 shadow-xl transition"
+        role="status" aria-live="polite"></div>
+
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script>
+        const PAYSTACK_PUBLIC_KEY = "pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY";
+        const STUDYPULSE_MONTHLY_FEE_KOBO = 500000;
+
+        // Course Database including Timetable 200 Level Courses
+        const defaultCourseData = {
+            100: [
+                {
+                    code: "SEN101",
+                    title: "Introduction to Software Engineering",
+                    modules: 1,
+                    description: "Foundations of software development lifecycle, engineering principles, and agile methodologies.",
+                    topics: [
+                        { title: "Module 1: The Software Crisis & Engineering Approach", content: "Software engineering is the systematic application of engineering approaches to software development. Unlike casual coding, it emphasizes maintainability, scalability, and teamwork.", example: "Example: Comparing writing a 50-line script vs architecting a multi-service web application with unit tests." }
+                    ]
+                }
+            ],
+            200: [
+                {
+                    code: "SEN 201",
+                    title: "Object-Oriented Programming (OOP)",
+                    modules: 3,
+                    description: "Taught by Dr. Fatoki. Core OOP paradigm shifts, encapsulation, inheritance, and polymorphism.",
+                    topics: [
+                        { title: "Module 1: Encapsulation & Access Control", content: "Bundling data and methods within a single class unit and restricting direct external access using private/public modifiers.", example: "Example: Private user balance attributes accessible only through getter and setter methods." },
+                        { title: "Module 2: Inheritance & Code Reuse", content: "Creating subclasses that inherit fields and methods from a parent superclass to reduce code redundancy.", example: "Example: Base class Employee with derived FullTimeEmployee and ContractEmployee classes." },
+                        { title: "Module 3: Polymorphism & Method Overriding", content: "Allowing different classes to implement methods with identical names that behave based on the calling object.", example: "Example: Shape base class with draw() method overridden in Circle and Rectangle classes." }
+                    ]
+                },
+                {
+                    code: "MTH 201",
+                    title: "Mathematical Methods / Linear Algebra",
+                    modules: 2,
+                    description: "Taught by Mr. Likinyo & Mrs. Akanmu. Matrix algebra, determinants, vector spaces, and complex number systems.",
+                    topics: [
+                        { title: "Module 1: Matrices & Gaussian Elimination", content: "Solving linear systems of equations using matrix inverses, determinants, and row operations.", example: "Example: Solving multi-variable circuit equations using augmented matrices." },
+                        { title: "Module 2: Vector Spaces & Transformations", content: "Linear independence, bases, dot/cross products, and linear transformations.", example: "Example: Applying 2D rotation and scaling matrices in graphics programming." }
+                    ]
+                },
+                {
+                    code: "CSC 202",
+                    title: "Computer Programming II / Data Structures",
+                    modules: 2,
+                    description: "Taught by Dr. John-Dewole. Linear data structures, pointers, dynamic memory, and algorithm complexity.",
+                    topics: [
+                        { title: "Module 1: Stacks and Queues", content: "LIFO (Last-In-First-Out) and FIFO (First-In-First-Out) data structures implemented with arrays or linked lists.", example: "Example: Implementing undo/redo buffers in text editors using a Stack." },
+                        { title: "Module 2: Big-O Complexity Analysis", content: "Measuring time and space efficiency growth relative to input size N.", example: "Example: Comparing O(n) linear search vs O(log n) binary search." }
+                    ]
+                },
+                {
+                    code: "STA 121",
+                    title: "Statistics for Computing",
+                    modules: 2,
+                    description: "Taught by Mrs. Akanmu. Descriptive statistics, probability distributions, and hypothesis testing.",
+                    topics: [
+                        { title: "Module 1: Descriptive Statistics & Variance", content: "Mean, median, mode, variance, and standard deviation calculations for dataset analysis.", example: "Example: Analyzing server response latency variance across peak hours." },
+                        { title: "Module 2: Probability & Distributions", content: "Conditional probability, Bayes' theorem, and normal/binomial distributions.", example: "Example: Calculating system error probability thresholds." }
+                    ]
+                },
+                {
+                    code: "CYB 201",
+                    title: "Introduction to Cybersecurity",
+                    modules: 2,
+                    description: "Taught by Dr. Ogunsanwo. CIA triad, threat modeling, vulnerabilities, and cryptography.",
+                    topics: [
+                        { title: "Module 1: The CIA Triad", content: "Confidentiality, Integrity, and Availability as foundational pillars of information security.", example: "Example: Enforcing access control lists (ACL) to maintain confidentiality." },
+                        { title: "Module 2: Cryptographic Principles", content: "Symmetric and asymmetric encryption, hashing algorithms (SHA-256), and digital signatures.", example: "Example: Hashing passwords with bcrypt before database storage." }
+                    ]
+                },
+                {
+                    code: "INS 201",
+                    title: "Information Science & Systems",
+                    modules: 1,
+                    description: "Taught by Dr. Ugege. Information lifecycles, storage repositories, and retrieval models.",
+                    topics: [
+                        { title: "Module 1: Information Lifecycles & Retrieval", content: "Generation, indexing, storage, dissemination, and information search systems.", example: "Example: Designing inverted index schemas for document retrieval engines." }
+                    ]
+                }
+            ],
+            300: [
+                {
+                    code: "SEN 301",
+                    title: "Software Architecture & Design Patterns",
+                    modules: 1,
+                    description: "Taught by Prof. Idowu. MVC, Microservices, and SOLID principles.",
+                    topics: [
+                        { title: "Module 1: SOLID Principles", content: "Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion.", example: "Example: Refactoring tightly coupled code using dependency injection." }
+                    ]
+                }
+            ]
+        };
+
+        let courseData = JSON.parse(localStorage.getItem("studypulse_courses") || "null") || defaultCourseData;
+        if (!localStorage.getItem("studypulse_courses")) {
+            localStorage.setItem("studypulse_courses", JSON.stringify(courseData));
+        }
+
+        // Authentication & Payment Session Check
+        function isUserSubscribed(user) {
+            const verifiedMatricNumbers = JSON.parse(localStorage.getItem("studypulse_verified_students") || "[]");
+            return verifiedMatricNumbers.some(matric => matric.toUpperCase() === user.matric.toUpperCase());
+        }
+
+        function getUserTransferRequest(user) {
+            const requests = JSON.parse(localStorage.getItem("studypulse_transfer_request") || "[]");
+            const requestList = Array.isArray(requests) ? requests : [requests];
+            return requestList.find(request => request.matric.toUpperCase() === user.matric.toUpperCase()) || null;
+        }
+
+        function recordUser(user) {
+            const users = JSON.parse(localStorage.getItem("studypulse_users") || "[]");
+            const existingIndex = users.findIndex(existing => existing.matric.toUpperCase() === user.matric.toUpperCase());
+            const record = { ...user, lastLoginAt: new Date().toISOString() };
+            if (existingIndex === -1) users.push(record);
+            else users[existingIndex] = record;
+            localStorage.setItem("studypulse_users", JSON.stringify(users));
+        }
+
+        function checkUserSession() {
+            const user = JSON.parse(localStorage.getItem("studypulse_user"));
+            const isSubscribed = user ? isUserSubscribed(user) : false;
+            const transferRequest = user ? getUserTransferRequest(user) : null;
+            const transferModal = document.getElementById("transfer-modal");
+            const userTransferRequest = transferRequest && user
+                && transferRequest.matric.toUpperCase() === user.matric.toUpperCase()
+                ? transferRequest
+                : null;
+            updateSubscriptionUI(isSubscribed, userTransferRequest);
+
+            if (!user) {
+                document.getElementById("auth-modal").classList.remove("hidden");
+                document.getElementById("paywall-modal").classList.add("hidden");
+                transferModal.classList.add("hidden");
+            } else {
+                document.getElementById("auth-modal").classList.add("hidden");
+                updateUserUI(user);
+
+                if (isSubscribed) {
+                    document.getElementById("paywall-modal").classList.add("hidden");
+                    transferModal.classList.add("hidden");
+                } else if (userTransferRequest && userTransferRequest.status === "pending") {
+                    document.getElementById("paywall-modal").classList.add("hidden");
+                    showTransferPending(userTransferRequest);
+                } else {
+                    transferModal.classList.add("hidden");
+                    document.getElementById("paywall-modal").classList.remove("hidden");
+                }
+            }
+        }
+
+        function updateSubscriptionUI(isSubscribed, transferRequest) {
+            const isPending = transferRequest && transferRequest.status === "pending";
+            const isRejected = transferRequest && transferRequest.status === "rejected";
+            const status = isSubscribed ? "Active" : isPending ? "Pending" : isRejected ? "Rejected" : "Inactive";
+            const detail = isSubscribed
+                ? "₦5,000 pass active."
+                : isPending
+                    ? "Payment awaiting admin verification."
+                    : isRejected
+                        ? "Transfer was rejected. You can submit a new reference."
+                        : "No active pass.";
+            const pill = document.getElementById("subscription-status-pill");
+            pill.textContent = status;
+            pill.className = isSubscribed
+                ? "rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600"
+                : isPending
+                    ? "rounded-md bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700"
+                    : isRejected
+                        ? "rounded-md bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-600"
+                        : "rounded-md bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600";
+            document.getElementById("subscription-status-detail").textContent = detail;
+            document.getElementById("subscription-card-heading").textContent = isSubscribed
+                ? "Active Monthly Subscription"
+                : isPending
+                    ? "Payment under review"
+                    : isRejected
+                        ? "Payment not verified"
+                        : "Subscription inactive";
+            document.getElementById("subscription-card-description").textContent = isSubscribed
+                ? "Your account has access to all engineering lecture notes and walkthrough examples."
+                : isPending
+                    ? "Your payment reference was submitted. Access starts after an admin verifies the payment."
+                    : isRejected
+                        ? "Your transfer could not be verified. Check the details and submit a new reference if needed."
+                        : "Complete a bank transfer and wait for payment verification to access the course notes.";
+            document.getElementById("subscription-plan-status").textContent = isSubscribed
+                ? "Access active"
+                : isPending
+                    ? "Pending review"
+                    : isRejected
+                        ? "Rejected — submit again"
+                        : "Awaiting payment";
+        }
+
+        function updateUserUI(user) {
+            document.getElementById("welcome-name").textContent = user.name.split(" ")[0];
+            document.getElementById("user-display-name").textContent = user.name;
+            document.getElementById("user-display-matric").textContent = user.matric;
+            const initial = user.name.charAt(0).toUpperCase();
+            document.getElementById("user-initial").textContent = initial;
+            document.getElementById("header-initial").textContent = initial;
+        }
+
+        document.getElementById("login-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const name = document.getElementById("login-name").value.trim();
+            const matric = document.getElementById("login-matric").value.trim();
+            if (!name || !matric) return;
+
+            const user = { name, matric, provider: "manual" };
+            localStorage.setItem("studypulse_user", JSON.stringify(user));
+            recordUser(user);
+            showToast(`Welcome, ${name}!`);
+            checkUserSession();
+        });
+
+        function loginWithGoogle() {
+            // Simulated Google OAuth Login
+            const user = { name: "Tolu Seyi Makiwa", matric: "LCU/UG/25/37419", provider: "google" };
+            localStorage.setItem("studypulse_user", JSON.stringify(user));
+            recordUser(user);
+            showToast("Successfully signed in with Google.");
+            checkUserSession();
+        }
+
+        function openTransferScreen() {
+            document.getElementById("paywall-modal").classList.add("hidden");
+            document.getElementById("transfer-modal").classList.remove("hidden");
+            document.getElementById("transfer-modal").classList.add("flex");
+            document.getElementById("transfer-form-view").classList.remove("hidden");
+            document.getElementById("transfer-pending-view").classList.add("hidden");
+            document.getElementById("transfer-reference").focus();
+        }
+
+        function storePaymentRequest(user, reference, method, email = "") {
+            const request = {
+                name: user.name,
+                matric: user.matric,
+                email,
+                amount: 5000,
+                reference,
+                method,
+                status: "pending",
+                submittedAt: new Date().toISOString()
+            };
+            const requests = JSON.parse(localStorage.getItem("studypulse_transfer_request") || "[]");
+            const requestList = Array.isArray(requests) ? requests : [requests];
+            const existingIndex = requestList.findIndex(item => item.matric.toUpperCase() === user.matric.toUpperCase());
+            if (existingIndex === -1) requestList.push(request);
+            else requestList[existingIndex] = request;
+            localStorage.setItem("studypulse_transfer_request", JSON.stringify(requestList));
+            return request;
+        }
+
+        function startPaystackPayment() {
+            const user = JSON.parse(localStorage.getItem("studypulse_user") || "null");
+            const emailInput = document.getElementById("paystack-email");
+            const email = emailInput.value.trim();
+            if (!user) {
+                showToast("Sign in before starting a payment.");
+                return;
+            }
+            if (!emailInput.reportValidity()) return;
+            if (PAYSTACK_PUBLIC_KEY.includes("REPLACE_WITH")) {
+                showToast("Add your Paystack public key in index.html before testing checkout.");
+                return;
+            }
+            if (!window.PaystackPop) {
+                showToast("Paystack could not be loaded. Check your connection and try again.");
+                return;
+            }
+
+            const expectedReference = `SP-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+            const handler = window.PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email,
+                amount: STUDYPULSE_MONTHLY_FEE_KOBO,
+                currency: "NGN",
+                ref: expectedReference,
+                callback: response => {
+                    const reference = response && typeof response.reference === "string"
+                        ? response.reference.trim()
+                        : "";
+                    if (!reference || reference !== expectedReference) {
+                        showToast("Paystack returned an invalid payment reference. No access was granted.");
+                        return;
+                    }
+
+                    storePaymentRequest(user, reference, "paystack", email);
+                    checkUserSession();
+                    showToast("Paystack reference saved. Access will activate after payment verification.");
+                },
+                onClose: () => showToast("Paystack checkout closed.")
+            });
+            handler.openIframe();
+        }
+
+        function showTransferPending(transferRequest) {
+            const transferModal = document.getElementById("transfer-modal");
+            transferModal.classList.remove("hidden");
+            transferModal.classList.add("flex");
+            document.getElementById("transfer-form-view").classList.add("hidden");
+            document.getElementById("transfer-pending-view").classList.remove("hidden");
+            document.getElementById("pending-reference").textContent = transferRequest.reference;
+            updateSubscriptionUI(false, transferRequest);
+        }
+
+        document.getElementById("transfer-back").addEventListener("click", () => {
+            document.getElementById("transfer-modal").classList.add("hidden");
+            document.getElementById("transfer-modal").classList.remove("flex");
+            document.getElementById("paywall-modal").classList.remove("hidden");
+        });
+
+        document.getElementById("transfer-form").addEventListener("submit", event => {
+            event.preventDefault();
+            const user = JSON.parse(localStorage.getItem("studypulse_user") || "null");
+            const reference = document.getElementById("transfer-reference").value.trim();
+            if (!user || !reference) {
+                showToast("Sign in and enter a transfer reference first.");
+                return;
+            }
+
+            const transferRequest = storePaymentRequest(user, reference, "bank transfer");
+            showTransferPending(transferRequest);
+            showToast("Transfer reference submitted for review.");
+        });
+
+        function logoutUser() {
+            localStorage.removeItem("studypulse_user");
+            checkUserSession();
+            showToast("Logged out successfully.");
+        }
+
+        // Navigation & Views
+        function switchView(viewId) {
+            const currentUser = JSON.parse(localStorage.getItem("studypulse_user") || "null");
+            const isSubscribed = currentUser ? isUserSubscribed(currentUser) : false;
+            if (!isSubscribed && viewId === 'courses') {
+                document.getElementById("paywall-modal").classList.remove("hidden");
+                return;
+            }
+
+            document.querySelectorAll(".app-view").forEach(el => el.classList.add("hidden"));
+            document.getElementById(`view-${viewId}`).classList.remove("hidden");
+
+            document.querySelectorAll(".sidebar-link").forEach(link => link.classList.remove("active"));
+            const activeLink = document.querySelector(`.sidebar-link[onclick*="${viewId}"]`);
+            if (activeLink) activeLink.classList.add("active");
+
+            const titles = { dashboard: "Dashboard", courses: "Course Library", planner: "Study Planner", reader: "Course Reader" };
+            document.getElementById("breadcrumb-title").textContent = titles[viewId] || "Dashboard";
+            document.getElementById("mobile-page-title").textContent = titles[viewId] || "Dashboard";
+
+            setMenuOpen(false);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (viewId === 'courses') switchLevel(200);
+        }
+
+        // Sidebar mobile toggle
+        const sidebar = document.getElementById("sidebar");
+        const backdrop = document.getElementById("sidebar-backdrop");
+        const menuButton = document.getElementById("menu-button");
+        const toast = document.getElementById("toast");
+        let toastTimeout;
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.remove("translate-y-3", "opacity-0");
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toast.classList.add("translate-y-3", "opacity-0"), 2400);
+        }
+
+        function setMenuOpen(open) {
+            sidebar.classList.toggle("-translate-x-full", !open);
+            backdrop.classList.toggle("hidden", !open);
+            menuButton.setAttribute("aria-expanded", String(open));
+        }
+
+        menuButton.addEventListener("click", () => setMenuOpen(menuButton.getAttribute("aria-expanded") !== "true"));
+        backdrop.addEventListener("click", () => setMenuOpen(false));
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        // Level Switcher
+        function switchLevel(level) {
+            document.querySelectorAll(".level-tab").forEach(tab => {
+                tab.className = "level-tab rounded-xl px-4 py-2 text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition";
+            });
+            const activeTab = document.getElementById(`tab-${level}`);
+            if (activeTab) activeTab.className = "level-tab rounded-xl px-4 py-2 text-sm font-bold bg-brand text-white shadow-sm transition";
+
+            const grid = document.getElementById("course-grid");
+            grid.innerHTML = "";
+
+            const courses = courseData[level] || [];
+            if (courses.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 text-sm">No notes available for ${level} Level yet.</div>`;
+                return;
+            }
+
+            courses.forEach(course => {
+                const card = document.createElement("div");
+                card.className = "group rounded-2xl border border-slate-100 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:border-indigo-200 cursor-pointer flex flex-col justify-between";
+                card.onclick = () => openCourseReader(level, course.code);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="mb-4 flex items-center justify-between">
+                            <span class="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-bold text-brand">${escapeHtml(course.code)}</span>
+                            <span class="text-xs font-semibold text-slate-400">${escapeHtml(course.modules)} Module${course.modules > 1 ? 's' : ''}</span>
+                        </div>
+                        <h3 class="text-base font-extrabold text-ink group-hover:text-brand transition">${escapeHtml(course.title)}</h3>
+                        <p class="mt-2 text-xs leading-relaxed text-slate-500">${escapeHtml(course.description)}</p>
+                    </div>
+                    <div class="mt-6 flex items-center justify-between border-t border-slate-50 pt-4">
+                        <span class="text-xs font-bold text-slate-600">Read lecture notes</span>
+                        <span class="grid h-8 w-8 place-items-center rounded-lg bg-indigo-50 text-brand transition group-hover:bg-brand group-hover:text-white">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                        </span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Open Reader
+        function openCourseReader(level, courseCode) {
+            const course = courseData[level].find(c => c.code === courseCode);
+            if (!course) return;
+
+            const container = document.getElementById("reader-content");
+            let topicsHtml = course.topics.map(t => `
+                <div class="rounded-xl border border-slate-100 bg-slate-50/50 p-5 space-y-3">
+                    <h3 class="text-base font-bold text-ink">${escapeHtml(t.title)}</h3>
+                    <p class="text-sm leading-relaxed text-slate-600">${escapeHtml(t.content)}</p>
+                    <div class="rounded-lg bg-white p-3.5 border border-indigo-100/50 text-xs font-medium text-indigo-900">
+                        💡 <strong>Walkthrough Example:</strong> ${escapeHtml(t.example)}
+                    </div>
+                </div>
+            `).join("");
+
+            container.innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                    <div>
+                        <span class="inline-block rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-bold text-brand mb-2">${escapeHtml(course.code)} · ${escapeHtml(level)} Level</span>
+                        <h1 class="text-2xl font-extrabold text-ink">${escapeHtml(course.title)}</h1>
+                        <p class="mt-1 text-sm text-slate-500">${escapeHtml(course.description)}</p>
+                    </div>
+                    <button onclick="showToast('Course notes bookmarked!')" class="inline-flex items-center gap-2 rounded-xl bg-indigo-50 px-4 py-2.5 text-xs font-bold text-brand transition hover:bg-indigo-100 self-start">
+                        Bookmark Course
+                    </button>
+                </div>
+                <div class="space-y-6 pt-2">
+                    <h2 class="text-lg font-extrabold text-ink">Detailed Timetable Lecture Notes & Explanations</h2>
+                    ${topicsHtml}
+                </div>
+            `;
+
+            switchView('reader');
+            document.getElementById("breadcrumb-title").textContent = course.code;
+            document.getElementById("mobile-page-title").textContent = course.code;
+        }
+
+        // Task Checklist
+        function updateTaskCount() {
+            const tasks = [...document.querySelectorAll(".task-check")];
+            const completed = tasks.filter(task => task.checked).length;
+            document.getElementById("task-count").textContent = `${completed} of ${tasks.length} completed`;
+            tasks.forEach(task => {
+                const row = task.closest(".task-row");
+                const title = row.querySelector(".task-title");
+                const badge = row.querySelector(".task-row > span:last-child");
+                title.classList.toggle("text-slate-400", task.checked);
+                title.classList.toggle("line-through", task.checked);
+                badge.textContent = task.checked ? "Done" : task.dataset.pending;
+                badge.classList.toggle("bg-emerald-50", task.checked);
+                badge.classList.toggle("text-emerald-600", task.checked);
+                if (!task.checked) badge.classList.remove("bg-emerald-50", "text-emerald-600");
+            });
+        }
+        document.querySelectorAll(".task-check").forEach(task => task.addEventListener("change", updateTaskCount));
+
+        document.getElementById("add-task-button").addEventListener("click", () => {
+            const title = window.prompt("What study goal would you like to add?");
+            if (!title || !title.trim()) return;
+            const label = document.createElement("label");
+            label.className = "task-row flex cursor-pointer items-center gap-3 rounded-xl border border-slate-100 p-3.5 transition hover:border-indigo-100 hover:bg-slate-50";
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.dataset.pending = "Today";
+            checkbox.className = "task-check h-4 w-4 rounded border-slate-300 accent-brand";
+            const details = document.createElement("span");
+            details.className = "min-w-0 flex-1";
+            const taskTitle = document.createElement("span");
+            taskTitle.className = "task-title block text-sm font-semibold";
+            taskTitle.textContent = title.trim();
+            const metadata = document.createElement("span");
+            metadata.className = "mt-1 block text-[11px] text-slate-400";
+            metadata.textContent = "Personal Goal";
+            details.append(taskTitle, metadata);
+            const badge = document.createElement("span");
+            badge.className = "rounded-md bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-700";
+            badge.textContent = "Today";
+            label.append(checkbox, details, badge);
+            document.getElementById("task-list").append(label);
+            checkbox.addEventListener("change", updateTaskCount);
+            updateTaskCount();
+            showToast("Goal added.");
+        });
+
+        // Initialize App Session
+        const currentUser = JSON.parse(localStorage.getItem("studypulse_user") || "null");
+        if (currentUser) recordUser(currentUser);
+        checkUserSession();
+        let totalCourses = 0;
+        Object.values(courseData).forEach(lvl => totalCourses += lvl.length);
+        document.getElementById("course-count-badge").textContent = totalCourses;
+        document.getElementById("stat-course-count").textContent = totalCourses;
+        updateTaskCount();
+
+        window.addEventListener("storage", event => {
+            if (event.key === "studypulse_courses" && event.newValue) {
+                courseData = JSON.parse(event.newValue);
+                let courseCount = 0;
+                Object.values(courseData).forEach(levelCourses => courseCount += levelCourses.length);
+                document.getElementById("course-count-badge").textContent = courseCount;
+                document.getElementById("stat-course-count").textContent = courseCount;
+                if (!document.getElementById("view-courses").classList.contains("hidden")) {
+                    const activeTab = document.querySelector(".level-tab.bg-brand");
+                    switchLevel(activeTab ? activeTab.id.replace("tab-", "") : 200);
+                }
+            }
+            if (["studypulse_verified_students", "studypulse_transfer_request", "studypulse_user"].includes(event.key)) {
+                checkUserSession();
+            }
+        });
+    </script>
+</body>
+
+</html>
